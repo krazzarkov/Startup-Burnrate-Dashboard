@@ -27,13 +27,13 @@ interface AssetCategory {
 
 export default function StatisticsPage() {
   const [data, setData] = useState<FinancialData[]>([])
-  const [burnRate, setBurnRate] = useState(0)
-  const [burnRateChange, setBurnRateChange] = useState(0)
-  const [runway, setRunway] = useState(0)
-  const [runwayChange, setRunwayChange] = useState(0)
-  const [avgMonthlySpend, setAvgMonthlySpend] = useState(0)
-  const [avgMonthlySpendChange, setAvgMonthlySpendChange] = useState(0)
-  const [remainingAssets, setRemainingAssets] = useState(0)
+  const [burnRate, setBurnRate] = useState<number | null>(null)
+  const [burnRateChange, setBurnRateChange] = useState<number | null>(null)
+  const [runway, setRunway] = useState<number | null>(null)
+  const [runwayChange, setRunwayChange] = useState<number | null>(null)
+  const [avgMonthlySpend, setAvgMonthlySpend] = useState<number | null>(null)
+  const [avgMonthlySpendChange, setAvgMonthlySpendChange] = useState<number | null>(null)
+  const [remainingAssets, setRemainingAssets] = useState<number | null>(null)
   const [categories, setCategories] = useState<AssetCategory[]>([])
 
   useEffect(() => {
@@ -72,15 +72,24 @@ export default function StatisticsPage() {
         const avgMonthlySpendChangePercent = previousMonth.spending !== 0 ? ((avgMonthlySpend - previousMonth.spending) / previousMonth.spending) * 100 : 0
         setAvgMonthlySpendChange(avgMonthlySpendChangePercent)
       } else {
-        setBurnRate(0)
-        setBurnRateChange(0)
-        setRunway(Infinity)
-        setRunwayChange(0)
-        setAvgMonthlySpend(0)
-        setAvgMonthlySpendChange(0)
+        // set default values if we don't have enough data
+        setBurnRate(null)
+        setBurnRateChange(null)
+        setRunway(null)
+        setRunwayChange(null)
+        setAvgMonthlySpend(null)
+        setAvgMonthlySpendChange(null)
       }
     } catch (error) {
       console.error('Error fetching financial data:', error)
+      // set all values to null in case of an error
+      setBurnRate(null)
+      setBurnRateChange(null)
+      setRunway(null)
+      setRunwayChange(null)
+      setAvgMonthlySpend(null)
+      setAvgMonthlySpendChange(null)
+      setRemainingAssets(null)
     }
   }
 
@@ -123,7 +132,9 @@ export default function StatisticsPage() {
     return null
   }
 
-  const PercentageIndicator = ({ value, metric }: { value: number, metric: 'burnRate' | 'runway' | 'avgMonthlySpend' }) => {
+  const PercentageIndicator = ({ value, metric }: { value: number | null, metric: 'burnRate' | 'runway' | 'avgMonthlySpend' }) => {
+    if (value === null) return null;
+
     const Icon = value >= 0 ? ArrowUpIcon : ArrowDownIcon
     let color = 'text-gray-500'
 
@@ -146,7 +157,7 @@ export default function StatisticsPage() {
   }
 
   const calculateRunwayEndDate = () => {
-    if (runway === Infinity || data.length === 0) return 'N/A'
+    if (runway === null || runway === Infinity || data.length === 0) return 'N/A'
     const lastDate = new Date(data[data.length - 1].date + '-01')
     const endDate = addMonths(lastDate, Math.floor(runway))
     return format(endDate, 'MMM yyyy')
@@ -162,7 +173,9 @@ export default function StatisticsPage() {
           </CardHeader>
           <CardContent>
             <div className="flex items-center justify-between">
-              <p className="text-2xl font-bold">${burnRate.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
+              <p className="text-2xl font-bold">
+                {burnRate !== null ? `$${burnRate.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : 'N/A'}
+              </p>
               <PercentageIndicator value={burnRateChange} metric="burnRate" />
             </div>
           </CardContent>
@@ -175,13 +188,13 @@ export default function StatisticsPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-2xl font-bold">
-                  {runway === Infinity ? 'Infinite' : `${runway.toFixed(1)} months`}
+                  {runway === null ? 'N/A' : runway === Infinity ? 'Infinite' : `${runway.toFixed(1)} months`}
                 </p>
                 <p className="text-sm text-gray-500">
                   Ends: {calculateRunwayEndDate()}
                 </p>
               </div>
-              {runway !== Infinity && <PercentageIndicator value={runwayChange} metric="runway" />}
+              {runway !== null && runway !== Infinity && <PercentageIndicator value={runwayChange} metric="runway" />}
             </div>
           </CardContent>
         </Card>
@@ -191,7 +204,9 @@ export default function StatisticsPage() {
           </CardHeader>
           <CardContent>
             <div className="flex items-center justify-between">
-              <p className="text-2xl font-bold">${avgMonthlySpend.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
+              <p className="text-2xl font-bold">
+                {avgMonthlySpend !== null ? `$${avgMonthlySpend.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : 'N/A'}
+              </p>
               <PercentageIndicator value={avgMonthlySpendChange} metric="avgMonthlySpend" />
             </div>
           </CardContent>
@@ -202,7 +217,9 @@ export default function StatisticsPage() {
           </CardHeader>
           <CardContent>
             <div className="flex items-center justify-between">
-              <p className="text-2xl font-bold">${remainingAssets.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
+              <p className="text-2xl font-bold">
+                {remainingAssets !== null ? `$${remainingAssets.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : 'N/A'}
+              </p>
             </div>
           </CardContent>
         </Card>
