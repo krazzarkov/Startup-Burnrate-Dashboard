@@ -2,6 +2,8 @@
 
 ## Overview
 
+![Dashboard Overview](screenshots/Dashboard.png)
+
 The **Startup Burnrate Dashboard** is a Next.js 14 application using ShadCN designed to provide startups with an intuitive and customizable interface to track and manage their financial burn rate. This project uses SQLite for the database and is optimized for deployment using Docker instead of Vercel as I made a mistake thinking Vercel would support SQLLite. However, with a few small changes to this code, a Postgres or other database can be integrated, allowing this web app to be deployed on Vercel. 
 
 ---
@@ -102,3 +104,17 @@ We welcome contributions! Please fork the repository and submit a pull request.
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ---
+
+## Screenshots
+
+1. **Dashboard**:
+   ![Dashboard Overview](screenshots/Dashboard.png)
+
+2. **Assets Page**:
+   ![Assets Page](screenshots/Assets_Page.png)
+
+3. **Monthly Spend**:
+   ![Monthly Spend](screenshots/Monthly_Spending.png)
+
+4. **Forecast Spend**:
+   ![Forecast](screenshots/Forecast.png)
